@@ -1,0 +1,9 @@
+/*
+Theme Name: Digital Newspaper Child
+Theme URI: https://periodismofederal.com/
+Description: Child theme of Digital Newspaper for Periodismo Federal. Keeps the parent as an upstream-updatable Composer dependency while making the site's appearance editable in git. Do NOT put CSS here — it loads before the parent's main.css and would lose. Edit assets/css/custom.css for styles, and copy parent template files into this directory to override markup.
+Author: Periodismo Federal
+Template: digital-newspaper
+Version: 1.0.0
+Text Domain: digital-newspaper-child
+*/

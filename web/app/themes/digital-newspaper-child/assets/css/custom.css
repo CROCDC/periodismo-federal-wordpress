@@ -1,0 +1,6 @@
+/*
+ * Periodismo Federal — brand/style overrides.
+ *
+ * This file loads after the parent's main.css and responsive.css, so rules here win
+ * without !important in most cases. Add child-theme styles below.
+ */
