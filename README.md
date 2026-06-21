@@ -1,54 +1,75 @@
-<p align="center">
-  <a href="https://roots.io/bedrock/">
-    <img alt="Bedrock" src="https://cdn.roots.io/app/uploads/logo-bedrock.svg" height="100">
-  </a>
-</p>
+# Periodismo Federal — periodismofederal.com
 
-<p align="center">
-  <a href="https://packagist.org/packages/roots/bedrock"><img alt="Packagist Installs" src="https://img.shields.io/packagist/dt/roots/bedrock?label=projects%20created&colorB=2b3072&colorA=525ddc&style=flat-square"></a>
-  <a href="https://packagist.org/packages/roots/wordpress"><img alt="roots/wordpress Packagist Downloads" src="https://img.shields.io/packagist/dt/roots/wordpress?label=roots%2Fwordpress%20downloads&logo=roots&logoColor=white&colorB=2b3072&colorA=525ddc&style=flat-square"></a>
-  <img src="https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/roots/bedrock/master/composer.json&label=wordpress&logo=roots&logoColor=white&query=$.require[%22roots/wordpress%22]&colorB=2b3072&colorA=525ddc&style=flat-square">
-  <a href="https://github.com/roots/bedrock/actions/workflows/ci.yml"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/roots/bedrock/ci.yml?branch=master&logo=github&label=CI&style=flat-square"></a>
-  <a href="https://twitter.com/rootswp"><img alt="Follow Roots" src="https://img.shields.io/badge/follow%20@rootswp-1da1f2?logo=twitter&logoColor=ffffff&message=&style=flat-square"></a>
-  <a href="https://github.com/sponsors/roots"><img src="https://img.shields.io/badge/sponsor%20roots-525ddc?logo=github&style=flat-square&logoColor=ffffff&message=" alt="Sponsor Roots"></a>
-</p>
+Version-controlled WordPress site for **periodismofederal.com**, managed with
+[Roots Bedrock](https://roots.io/bedrock/) (Composer + environment-based config)
+and auto-deployed to SiteGround from GitHub on every push to `main`.
 
-<p align="center">WordPress boilerplate with Composer, easier configuration, and an improved folder structure</p>
+## Project layout
 
-<p align="center">
-  <a href="https://roots.io/bedrock/">Website</a> &nbsp;&nbsp; <a href="https://roots.io/bedrock/docs/installation/">Documentation</a> &nbsp;&nbsp; <a href="https://github.com/roots/bedrock/releases">Releases</a> &nbsp;&nbsp; <a href="https://discourse.roots.io/">Community</a>
-</p>
+Bedrock structure (see the [Bedrock docs](https://roots.io/bedrock/docs/installation/)):
 
-## Support us
+```
+config/                 # environment config (application.php, environments/)
+web/                    # web root (document root points here)
+  app/                  # wp-content equivalent
+    themes/             # themes (Composer-managed; gitignored)
+    plugins/            # plugins (Composer-managed; gitignored)
+    mu-plugins/         # must-use plugins (single-file ones are committed)
+    uploads/            # media library (server-only; never committed)
+  wp/                   # WordPress core (Composer-installed; gitignored)
+composer.json           # core, theme and plugin versions
+.github/workflows/      # CI deploy to SiteGround
+```
 
-Roots is an independent open source org, supported only by developers like you. Your sponsorship funds [WP Packages](https://wp-packages.org/) and the entire Roots ecosystem, and keeps them independent. Support us by purchasing [Radicle](https://roots.io/radicle/) or [sponsoring us on GitHub](https://github.com/sponsors/roots) — sponsors get access to our private Discord.
+### Committed code (ours)
 
-### Sponsors
+- `web/app/mu-plugins/pf-adsense-sidebar.php` — must-use plugin that injects a
+  single AdSense display unit as the **first** widget of the main sidebar
+  (`sidebar-1`). The placement lives in Git (not in an Advanced Ads DB record);
+  it emits only the `<ins>` unit (Site Kit injects the loader), bails out on AMP,
+  and shows a dev-preview box outside production. Rollback = delete the file.
+- `web/app/mu-plugins/remove-twap-credit.php` — must-use plugin that hides the
+  "Powered By XYZScripts.com" backlink the `twitter-auto-publish` plugin prints in
+  the footer, by short-circuiting its `xyz_credit_link` option. Rollback = delete
+  the file.
+- `web/app/plugins/google-typography/` — active typography plugin, **removed from
+  wp.org**, so it is version-controlled here instead of pulled via Composer.
+- `web/app/plugins/advanced-post-types-order/` — premium post-ordering plugin
+  (currently inactive, kept on request); not on Packagist, so committed.
+- `web/.htaccess` — pretty-permalink rules (un-ignored from Bedrock's `.gitignore`).
 
-<a href="https://carrot.com/"><img src="https://cdn.roots.io/app/uploads/carrot.svg" alt="Carrot" height="90"></a> <a href="https://wordpress.com/"><img src="https://cdn.roots.io/app/uploads/wordpress.svg" alt="WordPress.com" height="90"></a> <a href="https://www.itineris.co.uk/"><img src="https://cdn.roots.io/app/uploads/itineris.svg" alt="Itineris" height="90"></a> <a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" height="90"></a>
+### Composer-managed (built in CI, never committed)
 
-## Overview
+WordPress core, the active theme (`digital-newspaper`) and the third-party plugins
+are pinned in `composer.json` and installed during the CI build — they are
+intentionally gitignored, not stored in the repo.
 
-Bedrock is a WordPress boilerplate for developers that want to manage their projects with Git and Composer. Much of the philosophy behind Bedrock is inspired by the [Twelve-Factor App](http://12factor.net/) methodology, including the [WordPress specific version](https://roots.io/twelve-factor-wordpress/).
+## Local development
 
-- Better folder structure
-- Dependency management with [Composer](https://getcomposer.org)
-  - [`roots/wordpress`](https://wp-packages.org/wordpress-core) package for WordPress core
-  - [WP Packages](https://wp-packages.org/) repository for WordPress plugins and themes
-- Easy WordPress configuration with environment specific files
-- Environment variables with [Dotenv](https://github.com/vlucas/phpdotenv)
-- Autoloader for mu-plugins (use regular plugins as mu-plugins)
+```bash
+cp .env.example .env      # then fill in DB + salts (https://roots.io/salts.html)
+composer install          # installs core, theme and plugins into web/
+```
 
-## Getting Started
+`.env` is never committed; each environment (local / production) has its own.
 
-See the [Bedrock installation documentation](https://roots.io/bedrock/docs/installation/).
+## Deploy
 
-## Community
+Push to `main` → GitHub Actions builds with Composer (`--no-dev`) and rsyncs the
+built tree to the server, then purges the cache. Media (`web/app/uploads/`) and
+the server `.env` are excluded from the sync and never touched (see
+`.deployignore`).
 
-Keep track of development and community news.
+All deploy credentials live **outside the repo**: SSH/host values are GitHub
+Actions **secrets**, and the production database credentials and salts live only
+in the server's `.env`. Nothing sensitive is committed.
 
-- Join us on Discord by [sponsoring us on GitHub](https://github.com/sponsors/roots)
-- Join us on [Roots Discourse](https://discourse.roots.io/)
-- Follow [@rootswp on Twitter](https://twitter.com/rootswp)
-- Follow the [Roots Blog](https://roots.io/blog/)
-- Subscribe to the [Roots Newsletter](https://roots.io/subscribe/)
+> Migration note: this site was moved from a panel-managed WordPress install to
+> Bedrock; the existing database and media library were preserved (WordPress was
+> not reinstalled). Bedrock serves media from `/app/uploads/` instead of
+> `/wp-content/uploads/`, so that path was rewritten in the database at cutover.
+
+## Credits
+
+Built on [Bedrock](https://roots.io/bedrock/) by Roots. Licensed under the MIT
+License (see [LICENSE.md](LICENSE.md)).

@@ -8,7 +8,7 @@
 # (>=8.3) and is the minimum SiteGround offers that Bedrock supports.
 #
 # Required GitHub secrets (see CONVENTIONS.md §6):
-#   SSH_HOST  SSH_PORT  SSH_USER  SSH_PRIVATE_KEY  DEPLOY_PATH
+#   SSH_HOST  SSH_PORT  SSH_USER  SSH_PRIVATE_KEY  DEPLOY_PATH  SSH_KEY_PASS
 
 name: Deploy to SiteGround
 
@@ -58,6 +58,7 @@ jobs:
           remote_port: ${{ secrets.SSH_PORT }}
           remote_user: ${{ secrets.SSH_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_key_pass: ${{ secrets.SSH_KEY_PASS }}
 
       - name: Post-deploy (flush WP + SiteGround cache; non-fatal)
         uses: appleboy/ssh-action@v1.2.0
@@ -66,6 +67,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_KEY_PASS }}
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             # Pin wp-cli to the site's PHP: SiteGround's `wp` wrapper defaults to
