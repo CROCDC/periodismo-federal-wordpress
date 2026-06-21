@@ -32,6 +32,16 @@ composer.json           # core, theme and plugin versions
   "Powered By XYZScripts.com" backlink the `twitter-auto-publish` plugin prints in
   the footer, by short-circuiting its `xyz_credit_link` option. Rollback = delete
   the file.
+- `web/app/mu-plugins/pf-open-graph.php` — must-use plugin that supplements
+  Jetpack's Open Graph output via the `jetpack_open_graph_tags` filter. Jetpack
+  already emits correct per-article OG/Twitter tags; this only adds the site-wide
+  and home values it leaves empty (`og:site_name`, `og:image:secure_url`,
+  `og:image:type`, and the front-page `og:title`/`og:description`). Per-article
+  previews are untouched. Rollback = delete the file.
+- `web/app/mu-plugins/pf-front-page-title.php` — must-use plugin that sets the
+  home page `<title>` (empty because the Site Title/Tagline are blank in
+  Settings → General). Scoped to the front page via `document_title_parts`, so
+  article titles and the theme header are untouched. Rollback = delete the file.
 - `web/app/plugins/google-typography/` — active typography plugin, **removed from
   wp.org**, so it is version-controlled here instead of pulled via Composer.
 - `web/app/plugins/advanced-post-types-order/` — premium post-ordering plugin
