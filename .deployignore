@@ -1,0 +1,27 @@
+# rsync exclude list for the SiteGround deploy. PRODUCTION-CRITICAL.
+# Paths listed here are NOT shipped AND are protected from --delete on the server
+# (because the workflow never passes --delete-excluded). See CONVENTIONS.md §6.
+#
+# Do NOT remove web/app/uploads/ or .env: they exist only on the server (media
+# library + production credentials). Dropping them here = first deploy wipes them.
+
+.git/
+.github/
+node_modules/
+.env
+.env.example
+web/app/uploads/
+docs/
+README.md
+.deployignore
+.gitignore
+.editorconfig
+tests/
+
+# --- This repo's local-only files (audit/scratch/support) — never ship to server ---
+SOPORTE-WORDPRESS-SSH.md
+local/
+relevamiento-periodismofederal-local/
+backups/
+todo
+.DS_Store

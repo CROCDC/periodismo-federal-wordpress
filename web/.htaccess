@@ -1,0 +1,50 @@
+# Apache rules shipped under the Bedrock docroot (web/), committed on purpose.
+#
+# Why version-controlled (not generated on the server):
+#   1. Bedrock's default .gitignore ignores web/.htaccess, so it never reaches the
+#      server unless we un-ignore and ship it.
+#   2. `wp rewrite flush --hard` CANNOT regenerate it under Bedrock (WP-CLI warns
+#      "Regenerating a .htaccess file requires special configuration").
+# SiteGround serves PHP via Apache (behind nginx), which honours .htaccess. Without
+# this file the home page (served at /) works but every pretty permalink 404s.
+#
+# This mirrors the directives the live (pre-Bedrock) docroot carried, so the migrated
+# docroot behaves identically:
+#   - Force HTTPS (SG Optimizer).
+#   - Disable xmlrpc.php.
+#   - WordPress front controller (route non-file/dir requests to index.php), with the
+#     Authorization header passthrough for the REST API.
+#   - Pin the PHP version to 8.6 (php86) — the version the live docroot ran. SiteGround
+#     selects the docroot PHP via this handler; keeping it guarantees Bedrock (which
+#     requires >= 8.3) runs on the same PHP after the symlink swap.
+
+# HTTPS forced by SG-Optimizer
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+# END HTTPS
+
+# SGS XMLRPC Disable Service
+<Files xmlrpc.php>
+	order deny,allow
+	deny from all
+</Files>
+# SGS XMLRPC Disable Service END
+
+# BEGIN WordPress (Bedrock front controller in web/)
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+
+# SiteGround PHP version pin (matches the live docroot — keeps Bedrock on PHP 8.6)
+AddHandler application/x-httpd-php86 .php .php5 .php4 .php3

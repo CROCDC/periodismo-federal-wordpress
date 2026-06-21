@@ -1,0 +1,53 @@
+# Application
+web/app/plugins/*
+!web/app/plugins/.gitkeep
+# Committed plugins (not on wp.org → version-controlled, un-ignored from the rule above):
+#   google-typography          — active, removed from wp.org
+#   advanced-post-types-order  — premium (inactive), kept on request
+!web/app/plugins/google-typography/
+!web/app/plugins/advanced-post-types-order/
+# Ignore Composer-installed mu-plugin directories; single-file mu-plugins are tracked intentionally
+web/app/mu-plugins/*/
+# Composer-managed public themes (installed in CI, never committed — like the plugins):
+web/app/themes/twentytwentyfive/
+web/app/themes/digital-newspaper/
+web/app/upgrade
+web/app/uploads/*
+!web/app/uploads/.gitkeep
+web/app/cache/*
+
+# WordPress
+web/wp
+web/.htaccess
+# ...but DO commit web/.htaccess: SiteGround needs it for pretty permalinks and
+# WP-CLI can't regenerate it under Bedrock (CONVENTIONS §9).
+!web/.htaccess
+
+# Local-only audit / mirror / scratch / support — never committed (esp. to a public repo)
+local/
+relevamiento-periodismofederal-local/
+backups/
+SOPORTE-WORDPRESS-SSH.md
+todo
+node_modules/
+.DS_Store
+
+# Logs
+*.log
+
+# Dotenv
+.env
+.env.*
+!.env.example
+
+# Composer
+/vendor
+auth.json
+
+# PHPUnit/Pest
+phpunit.xml
+.phpunit.result.cache
+.phpunit.cache
+
+# WP-CLI
+wp-cli.local.yml

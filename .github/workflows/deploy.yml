@@ -1,0 +1,78 @@
+# Auto-deploy a Bedrock WordPress site to SiteGround on push.
+# Source of truth: templates/siteground-wp/CONVENTIONS.md (§6).
+#
+# This site (periodismofederal.com) is buildless: the theme (digital-newspaper) is a
+# Composer dependency with no JS/CSS toolchain, so there is no Node build step.
+#
+# PHP is pinned to 8.3 (php83 on the server) — satisfies composer.json require.php
+# (>=8.3) and is the minimum SiteGround offers that Bedrock supports.
+#
+# Required GitHub secrets (see CONVENTIONS.md §6):
+#   SSH_HOST  SSH_PORT  SSH_USER  SSH_PRIVATE_KEY  DEPLOY_PATH
+
+name: Deploy to SiteGround
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP + Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies (builds vendor/ + web/wp)
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      # rsync ships the built tree. --delete prunes stale files on the server,
+      # but excluded paths (uploads, .env) are PROTECTED because we never pass
+      # --delete-excluded. See CONVENTIONS.md §6 "The --delete footgun".
+      - name: Deploy via rsync over SSH
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --delete --exclude-from=.deployignore
+          path: ./
+          remote_path: ${{ secrets.DEPLOY_PATH }}
+          remote_host: ${{ secrets.SSH_HOST }}
+          remote_port: ${{ secrets.SSH_PORT }}
+          remote_user: ${{ secrets.SSH_USER }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Post-deploy (flush WP + SiteGround cache; non-fatal)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.DEPLOY_PATH }}
+            # Pin wp-cli to the site's PHP: SiteGround's `wp` wrapper defaults to
+            # php-recommended (currently 8.6), not the site's web PHP.
+            export PHP_BIN=php83
+            # SG Optimizer ships via Composer; keep it active so `wp sg purge`
+            # exists and the SiteGround Dynamic Cache is purged on every deploy.
+            wp plugin activate sg-cachepress --path=web/wp || true
+            wp cache flush --path=web/wp || true
+            wp sg purge --path=web/wp || true

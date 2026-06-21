@@ -1,0 +1,108 @@
+{
+  "name": "roots/bedrock",
+  "type": "project",
+  "license": "MIT",
+  "description": "WordPress boilerplate with Composer, easier configuration, and an improved folder structure",
+  "homepage": "https://roots.io/bedrock/",
+  "authors": [
+    {
+      "name": "Scott Walkinshaw",
+      "email": "scott.walkinshaw@gmail.com",
+      "homepage": "https://github.com/swalkinshaw"
+    },
+    {
+      "name": "Ben Word",
+      "email": "ben@benword.com",
+      "homepage": "https://github.com/retlehs"
+    }
+  ],
+  "keywords": [
+    "bedrock", "composer", "roots", "wordpress-composer", "wordpress", "wp-composer", "wp-config", "wp"
+  ],
+  "support": {
+    "issues": "https://github.com/roots/bedrock/issues",
+    "forum": "https://discourse.roots.io/category/bedrock"
+  },
+  "repositories": [
+    {
+      "name": "wp-packages",
+      "type": "composer",
+      "url": "https://repo.wp-packages.org"
+    }
+  ],
+  "require": {
+    "php": ">=8.3",
+    "composer/installers": "^2.0",
+    "oscarotero/env": "^2.0",
+    "roots/bedrock-autoloader": "^1.0",
+    "roots/bedrock-disallow-indexing": "^2.0",
+    "roots/wordpress": "7.0",
+    "roots/wp-config": "^1.0",
+    "vlucas/phpdotenv": "^5.0",
+    "wp-plugin/accelerated-mobile-pages": "1.1.14",
+    "wp-plugin/ads-txt": "1.4.6",
+    "wp-plugin/advanced-ads": "2.0.22",
+    "wp-plugin/advanced-ads-adsense-in-feed": "2.1.2",
+    "wp-plugin/advanced-custom-fields": "6.6.1",
+    "wp-plugin/akismet": "5.7",
+    "wp-plugin/breeze": "2.5.6",
+    "wp-plugin/contact-form-7": "6.1.6",
+    "wp-plugin/ga-google-analytics": "20260421",
+    "wp-plugin/google-site-kit": "1.181.0",
+    "wp-plugin/jetpack": "15.9",
+    "wp-plugin/kadence-starter-templates": "2.3.2",
+    "wp-plugin/newsletter": "9.2.8",
+    "wp-plugin/notix-web-push-notifications": "1.2.4",
+    "wp-plugin/pdf-viewer-block": "1.1",
+    "wp-plugin/redirection": "5.8.0",
+    "wp-plugin/reveal-ids-for-wp-admin-25": "1.6.2",
+    "wp-plugin/sg-ai-studio": "1.2.0",
+    "wp-plugin/sg-cachepress": "7.7.11",
+    "wp-plugin/sg-security": "1.6.2",
+    "wp-plugin/trinity-audio": "5.26.0",
+    "wp-plugin/twitter-auto-publish": "1.7.7",
+    "wp-plugin/wordpress-importer": "0.9.5",
+    "wp-plugin/wordpress-popular-posts": "7.4.0",
+    "wp-plugin/wp-amp-it-up": "4.3",
+    "wp-plugin/wp-typography": "5.11.0",
+    "wp-plugin/wpcat2tag-importer": "0.6.3",
+    "wp-plugin/zero-bs-crm": "6.8.1",
+    "wp-theme/digital-newspaper": "1.1.18",
+    "wp-theme/twentytwentyfive": "^1.0"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.0",
+    "pestphp/pest": "^4.0"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "allow-plugins": {
+      "composer/installers": true,
+      "roots/wordpress-core-installer": true,
+      "pestphp/pest-plugin": true
+    },
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "extra": {
+    "installer-paths": {
+      "web/app/mu-plugins/{$name}/": [
+        "type:wordpress-muplugin"
+      ],
+      "web/app/plugins/{$name}/": [
+        "type:wordpress-plugin"
+      ],
+      "web/app/themes/{$name}/": [
+        "type:wordpress-theme"
+      ]
+    },
+    "wordpress-install-dir": "web/wp"
+  },
+  "scripts": {
+    "lint": "pint --test",
+    "lint:fix": "pint",
+    "test": "pest"
+  }
+}
