@@ -32,7 +32,7 @@ if ( ! defined( 'PF_ADSENSE_SIDEBAR_CLIENT' ) ) {
 // Ad unit slot ID (data-ad-slot, a numeric string). Create a responsive Display ad
 // in AdSense → Ads → By ad unit, then paste its slot ID here.
 if ( ! defined( 'PF_ADSENSE_SIDEBAR_SLOT' ) ) {
-	define( 'PF_ADSENSE_SIDEBAR_SLOT', 'XXXXXXXXXX' );
+	define( 'PF_ADSENSE_SIDEBAR_SLOT', '7326770339' );
 }
 
 // The registered sidebar this ad is injected into, and the position is "first".
