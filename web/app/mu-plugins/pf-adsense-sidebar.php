@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // AdSense publisher ID (ca-pub-XXXXXXXXXXXXXXXX). From AdSense → Account → Settings.
 if ( ! defined( 'PF_ADSENSE_SIDEBAR_CLIENT' ) ) {
-	define( 'PF_ADSENSE_SIDEBAR_CLIENT', 'ca-pub-XXXXXXXXXXXXXXXX' );
+	define( 'PF_ADSENSE_SIDEBAR_CLIENT', 'ca-pub-1978971118006130' );
 }
 
 // Ad unit slot ID (data-ad-slot, a numeric string). Create a responsive Display ad
