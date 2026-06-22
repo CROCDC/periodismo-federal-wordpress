@@ -5,9 +5,12 @@
  * Version: 1.0.0
  *
  * Why a mu-plugin and not Advanced Ads: the ad POSITION is kept in version control
- * here. It intentionally does NOT print the AdSense loader (adsbygoogle.js): the
- * Site Kit plugin already injects it once AdSense is connected, and printing it
- * twice violates AdSense policy. This file only emits the <ins> unit + push call.
+ * here. This file owns the whole AdSense wiring for the slot — it prints the loader
+ * (adsbygoogle.js) in <head> AND the <ins> unit in the sidebar. Site Kit's own
+ * AdSense snippet was intentionally disabled (it was pinned to a stale hosted
+ * account, ca-pub-9137871268664469); if you ever re-enable Site Kit's snippet for
+ * THIS account, define PF_ADSENSE_SIDEBAR_SKIP_LOADER to avoid loading the script
+ * twice.
  *
  * AMP note: on AMP requests a plain <ins>/<script> unit is invalid, and the AMP
  * plugins on this site render their own layout (not the theme's sidebar.php), so
@@ -72,6 +75,44 @@ function pf_adsense_sidebar_is_amp() {
 	}
 	return false;
 }
+
+/**
+ * Whether to emit the real AdSense markup (loader + unit) to live visitors:
+ * production, fully configured, and not an AMP request.
+ *
+ * @return bool
+ */
+function pf_adsense_sidebar_should_serve() {
+	if ( ! defined( 'WP_ENV' ) || 'production' !== WP_ENV ) {
+		return false;
+	}
+	if ( ! pf_adsense_sidebar_is_configured() ) {
+		return false;
+	}
+	if ( pf_adsense_sidebar_is_amp() ) {
+		return false;
+	}
+	return true;
+}
+
+/**
+ * Print the AdSense loader in <head>. This plugin owns the loader because Site
+ * Kit's AdSense snippet is disabled (it pointed at a stale hosted account). The
+ * same loader also enables Auto Ads if Auto Ads is turned on for this account.
+ */
+function pf_adsense_sidebar_loader() {
+	if ( defined( 'PF_ADSENSE_SIDEBAR_SKIP_LOADER' ) && PF_ADSENSE_SIDEBAR_SKIP_LOADER ) {
+		return; // Loader provided elsewhere (e.g. Site Kit re-enabled for this account).
+	}
+	if ( ! pf_adsense_sidebar_should_serve() ) {
+		return;
+	}
+	printf(
+		'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%s" crossorigin="anonymous"></script>' . "\n",
+		esc_attr( PF_ADSENSE_SIDEBAR_CLIENT )
+	);
+}
+add_action( 'wp_head', 'pf_adsense_sidebar_loader', 20 );
 
 /**
  * Print the ad as the first widget of the target sidebar. Hooked on
