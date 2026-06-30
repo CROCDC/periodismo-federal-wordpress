@@ -66,3 +66,17 @@ add_action( 'wp_enqueue_scripts', function () {
 		wp_get_theme()->get( 'Version' )
 	);
 }, 20 );
+
+// Next Tech shared footer. Printed via wp_footer (fires just before </body> in the parent's
+// footer.php) so the parent template stays an unmodified, upstream-updatable dependency. The
+// wrapper reuses --dark-bk-color so the band matches the site's dark footer in both light and
+// dark mode; the component itself is transparent and Shadow-DOM isolated. The remote script
+// registers <nexttech-footer> on load; source= tags clicks as utm_source for nexttech's Umami.
+add_action( 'wp_footer', function () {
+	?>
+	<div class="nexttech-footer-wrap" style="background-color: var(--dark-bk-color);">
+		<script src="https://nexttech.com.ar/static/js/nexttechFooter.js"></script>
+		<nexttech-footer source="periodismo-federal"></nexttech-footer>
+	</div>
+	<?php
+}, 100 );
